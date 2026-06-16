@@ -9,7 +9,7 @@ Gebaut als Demonstrator für einen Pitch zu Anthropic/Claude — und um zu zeige
 möglich ist: Claude liest und interpretiert **live** das Marktumfeld, sieht kreative Wechselwirkungen
 mit dem Geschäftsmodell und macht dabei **Unsicherheit sichtbar**, statt sie zu kaschieren.
 
-👉 **Live:** _wird nach Aktivierung von GitHub Pages eingetragen_
+👉 **Live:** <https://bartfastiel.github.io/strategist-ai-cockpit/>
 
 ## Die sechs Bereiche (Tabs)
 
