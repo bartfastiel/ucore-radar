@@ -1,23 +1,24 @@
 /* uCORE Marktradar — frontend. Reads config/profile.json and the data/news.json datastore
-   (produced hourly by the GitHub Actions scan), renders KPIs, a chance–risk spectrum and the
-   evaluated-events feed. No API key in the browser; the dashboard is purely a reader. */
+   (produced hourly by the GitHub Actions scan). Renders KPIs, a Chance/Risk × Certainty
+   scatter matrix, and three columns (Risiken | Neutral | Chancen). Hovering a point in the
+   matrix isolates that single event in the columns below. No API key in the browser. */
 (function () {
   const $ = (s, r) => (r || document).querySelector(s);
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-  let DATA = { items: [] }, FILTER = "all", SORT = "recent";
+  let DATA = { items: [] }, SORT = "impact", focusId = null, pinnedId = null;
 
   const isOpp = (f) => f >= 0.2, isRisk = (f) => f <= -0.2, isNeutral = (f) => f > -0.2 && f < 0.2;
+  const catOf = (it) => isOpp(it.factor) ? "opportunity" : isRisk(it.factor) ? "risk" : "neutral";
 
-  // factor -1..+1 → CSS color
   function factorColor(f) {
-    if (f >= 0.2) { const t = Math.min(1, (f - 0.2) / 0.8); return `hsl(${140}, ${45 + t * 25}%, ${42 - t * 6}%)`; }
-    if (f <= -0.2) { const t = Math.min(1, (-f - 0.2) / 0.8); return `hsl(${6}, ${50 + t * 25}%, ${52 - t * 8}%)`; }
-    return "hsl(215, 12%, 52%)";
+    if (f >= 0.2) { const t = Math.min(1, (f - 0.2) / 0.8); return `hsl(140, ${45 + t * 25}%, ${44 - t * 6}%)`; }
+    if (f <= -0.2) { const t = Math.min(1, (-f - 0.2) / 0.8); return `hsl(6, ${50 + t * 25}%, ${54 - t * 8}%)`; }
+    return "hsl(215, 12%, 55%)";
   }
-  const catLabel = (c) => ({ risk: "Risiko", neutral: "Neutral", opportunity: "Chance" }[c] || "Neutral");
-  function fmtFactor(f) { return (f > 0 ? "+" : "") + f.toFixed(2); }
+  const catLabel = (c) => ({ risk: "Risiko", neutral: "Neutral", opportunity: "Chance" }[c]);
+  const fmtFactor = (f) => (f > 0 ? "+" : "") + f.toFixed(2);
 
   function relTime(iso) {
     if (!iso) return "";
@@ -47,23 +48,18 @@
   }
 
   function render() {
-    renderUpdated();
+    $("#updated").textContent = DATA.updatedAt ? "aktualisiert " + relTime(DATA.updatedAt) : "noch keine Daten";
     renderKpis();
-    renderSpectrum();
-    renderFilters();
-    renderFeed();
+    renderChart();
+    renderColumns();
+    $("#sort").value = SORT;
+    $("#sort").onchange = (e) => { SORT = e.target.value; renderColumns(); };
     const n = DATA.items.length;
     $("#ft-count").textContent = n ? n + " bewertete Ereignisse im Radar" : "";
   }
 
-  function renderUpdated() {
-    const u = DATA.updatedAt;
-    $("#updated").textContent = u ? "aktualisiert " + relTime(u) : "noch keine Daten";
-  }
-
   function avgFactor() {
     if (!DATA.items.length) return 0;
-    // recency- & confidence-weighted mean
     let sw = 0, s = 0;
     DATA.items.forEach((it) => {
       const ageD = it.scannedAt ? (Date.now() - new Date(it.scannedAt)) / 864e5 : 30;
@@ -78,11 +74,11 @@
     const opp = items.filter((i) => isOpp(i.factor)).length;
     const risk = items.filter((i) => isRisk(i.factor)).length;
     const avg = avgFactor();
-    const tendLabel = avg > 0.12 ? "Tendenz: eher Chancen" : avg < -0.12 ? "Tendenz: eher Risiken" : "Tendenz: ausgewogen";
+    const tend = avg > 0.12 ? "Tendenz: eher Chancen" : avg < -0.12 ? "Tendenz: eher Risiken" : "Tendenz: ausgewogen";
     const pct = ((avg + 1) / 2) * 100;
     $("#kpis").innerHTML = `
       <div class="kpi kpi-tend">
-        <div class="kpi-label">${esc(tendLabel)}</div>
+        <div class="kpi-label">${esc(tend)}</div>
         <div class="needle-track"><div class="needle" style="left:${pct}%"></div></div>
         <div class="needle-scale"><span>Risiko</span><span>${fmtFactor(avg)}</span><span>Chance</span></div>
       </div>
@@ -91,79 +87,89 @@
       <div class="kpi"><div class="kpi-num">${items.length}</div><div class="kpi-label">beobachtet</div></div>`;
   }
 
-  function renderSpectrum() {
-    const host = $("#spectrum");
+  /* --- Scatter matrix: x = factor (-1..+1), y = confidence (0..1) --- */
+  function renderChart() {
+    const host = $("#chart");
     if (!DATA.items.length) { host.innerHTML = `<p class="empty">Noch keine Ereignisse — der stündliche Scan füllt das Radar.</p>`; return; }
     const dots = DATA.items.map((it) => {
-      const pct = ((it.factor + 1) / 2) * 100;
-      const sz = 9 + (it.confidence || 0.5) * 7;
-      return `<button class="dot-btn" style="left:${pct}%;width:${sz}px;height:${sz}px;background:${factorColor(it.factor)}"
-        title="${esc(fmtFactor(it.factor) + " · " + it.title)}" data-id="${esc(it.id)}"></button>`;
+      const x = ((it.factor + 1) / 2) * 100;
+      const y = Math.max(0, Math.min(1, it.confidence || 0.5)) * 100;
+      return `<button class="pt" role="listitem" data-id="${esc(it.id)}"
+        style="left:${x}%;bottom:${y}%;background:${factorColor(it.factor)}"
+        title="${esc(fmtFactor(it.factor) + " · Gewissheit " + Math.round((it.confidence || 0) * 100) + "% · " + it.title)}"></button>`;
     }).join("");
-    host.innerHTML = `<div class="axis"><span>Risiko −1</span><span>0</span><span>+1 Chance</span></div>
-      <div class="track">${dots}</div>`;
-    host.querySelectorAll(".dot-btn").forEach((b) => b.onclick = () => {
-      const card = document.querySelector(`.card[data-id="${b.dataset.id}"]`);
-      if (card) { card.scrollIntoView({ behavior: "smooth", block: "center" }); card.classList.add("flash"); setTimeout(() => card.classList.remove("flash"), 1400); }
+    host.innerHTML = `
+      <div class="scatter">
+        <div class="y-axis"><span>Gewissheit</span></div>
+        <div class="plot-wrap">
+          <div class="y-ticks"><span>hoch</span><span>mittel</span><span>gering</span></div>
+          <div class="plot" role="list">
+            <div class="grid-v"></div><div class="grid-h"></div>
+            <div class="q q-tl">unsicher · Risiko</div><div class="q q-tr">sicher · Chance</div>
+            ${dots}
+          </div>
+        </div>
+        <div class="x-axis"><span>Risiko −1</span><span>neutral 0</span><span>+1 Chance</span></div>
+      </div>`;
+    host.querySelectorAll(".pt").forEach((p) => {
+      const id = p.dataset.id;
+      p.addEventListener("mouseenter", () => setFocus(id));
+      p.addEventListener("mouseleave", () => setFocus(null));
+      p.addEventListener("click", () => { pinnedId = pinnedId === id ? null : id; setFocus(null); });
     });
   }
 
-  function renderFilters() {
-    const items = DATA.items;
-    const defs = [
-      ["all", "Alle", items.length],
-      ["opportunity", "Chancen", items.filter((i) => isOpp(i.factor)).length],
-      ["neutral", "Neutral", items.filter((i) => isNeutral(i.factor)).length],
-      ["risk", "Risiken", items.filter((i) => isRisk(i.factor)).length]
-    ];
-    $("#filters").innerHTML = defs.map(([k, l, n]) =>
-      `<button class="chip ${k === FILTER ? "on" : ""}" data-f="${k}">${l} <span>${n}</span></button>`).join("");
-    $("#filters").querySelectorAll(".chip").forEach((c) => c.onclick = () => { FILTER = c.dataset.f; render(); });
-    const sel = $("#sort"); sel.value = SORT; sel.onchange = () => { SORT = sel.value; renderFeed(); };
+  function setFocus(id) { focusId = id; renderColumns(); }
+  function activeId() { return pinnedId || focusId; }
+
+  function sortItems(arr) {
+    const t = (x) => new Date(x.scannedAt || x.publishedAt || 0).getTime();
+    if (SORT === "recent") return arr.sort((a, b) => t(b) - t(a));
+    if (SORT === "certainty") return arr.sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
+    return arr.sort((a, b) => Math.abs(b.factor) - Math.abs(a.factor)); // impact
   }
 
-  function filtered() {
-    let arr = DATA.items.slice();
-    if (FILTER === "opportunity") arr = arr.filter((i) => isOpp(i.factor));
-    else if (FILTER === "risk") arr = arr.filter((i) => isRisk(i.factor));
-    else if (FILTER === "neutral") arr = arr.filter((i) => isNeutral(i.factor));
-    const t = (x) => new Date(x.scannedAt || x.publishedAt || 0).getTime();
-    if (SORT === "recent") arr.sort((a, b) => t(b) - t(a));
-    else if (SORT === "impact") arr.sort((a, b) => Math.abs(b.factor) - Math.abs(a.factor));
-    else if (SORT === "opp") arr.sort((a, b) => b.factor - a.factor);
-    else if (SORT === "risk") arr.sort((a, b) => a.factor - b.factor);
-    return arr;
+  function renderColumns() {
+    const host = $("#columns");
+    const act = activeId();
+    // highlight active point
+    document.querySelectorAll(".pt").forEach((p) => p.classList.toggle("active", p.dataset.id === act));
+
+    const defs = [
+      { k: "risk", t: "Risiken", cls: "col-risk" },
+      { k: "neutral", t: "Neutral", cls: "col-neutral" },
+      { k: "opportunity", t: "Chancen", cls: "col-opp" }
+    ];
+    const visible = act ? DATA.items.filter((i) => i.id === act) : DATA.items;
+    const banner = act
+      ? `<div class="focus-bar">Fokus auf 1 Ereignis — ${pinnedId ? "klick auf den Punkt löst die Auswahl" : "Maus vom Punkt nehmen blendet wieder alle ein"}.</div>`
+      : "";
+
+    host.innerHTML = banner + `<div class="cols">` + defs.map((d) => {
+      const all = DATA.items.filter((i) => catOf(i) === d.k);
+      const shown = sortItems(visible.filter((i) => catOf(i) === d.k));
+      return `<section class="col ${d.cls}">
+        <header><h3>${d.t}</h3><span class="cnt">${all.length}</span></header>
+        <div class="cards">${shown.length ? shown.map(card).join("") : `<div class="col-empty">${act ? "" : "—"}</div>`}</div>
+      </section>`;
+    }).join("") + `</div>`;
   }
 
   function card(it) {
     const col = factorColor(it.factor);
-    const pct = ((it.factor + 1) / 2) * 100;
-    const conf = it.confidence != null ? `<span class="conf" title="Konfidenz der Einschätzung">◑ ${Math.round(it.confidence * 100)}%</span>` : "";
+    const conf = it.confidence != null ? `<span class="conf" title="Gewissheit der Einschätzung">◑ ${Math.round(it.confidence * 100)}%</span>` : "";
     const seed = it.seed ? `<span class="seed" title="Startwert – wird durch den Live-Scan ergänzt">Startwert</span>` : "";
-    const when = it.publishedAt ? relTime(it.publishedAt) : relTime(it.scannedAt);
+    const when = relTime(it.publishedAt || it.scannedAt);
     return `<article class="card" data-id="${esc(it.id)}" style="--col:${col}">
-      <div class="card-stripe"></div>
-      <div class="card-main">
-        <div class="card-top">
-          <span class="factor-pill" style="background:${col}">${fmtFactor(it.factor)}</span>
-          <span class="cat">${catLabel(it.category)}</span>
-          ${seed}
-          <span class="grow"></span>
-          <span class="src">${esc(it.source || "")} · ${esc(when)}</span>
-        </div>
-        <h3 class="card-title"><a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.title)}</a></h3>
-        <div class="factor-bar"><div class="fb-zero"></div><div class="fb-fill" style="left:${Math.min(50, pct)}%;width:${Math.abs(pct - 50)}%;background:${col}"></div></div>
-        <p class="reason">${esc(it.reasoning || "")}</p>
-        <div class="card-foot">${conf}<a class="read" href="${esc(it.url)}" target="_blank" rel="noopener">Zur Quelle ↗</a></div>
+      <div class="card-top">
+        <span class="factor-pill" style="background:${col}">${fmtFactor(it.factor)}</span>
+        ${conf}${seed}<span class="grow"></span>
+        <span class="src">${esc(it.source || "")} · ${esc(when)}</span>
       </div>
+      <h4 class="card-title"><a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.title)}</a></h4>
+      <p class="reason">${esc(it.reasoning || "")}</p>
+      <a class="read" href="${esc(it.url)}" target="_blank" rel="noopener">Zur Quelle ↗</a>
     </article>`;
-  }
-
-  function renderFeed() {
-    const arr = filtered();
-    const feed = $("#feed");
-    if (!arr.length) { feed.innerHTML = `<p class="empty">Keine Ereignisse in dieser Ansicht.</p>`; return; }
-    feed.innerHTML = arr.map(card).join("");
   }
 
   if (document.readyState !== "loading") load();

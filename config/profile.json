@@ -6,22 +6,33 @@
   "businessModel": "uCORE Systems GmbH (Andernach, gegr. 2022) entwickelt eine modulare Plattform für situationsbasierte Assistenzsysteme in Wohn- und Pflegeumgebungen. Kernprodukte: CORE-ONE (lokaler IoT-Hub/Gateway), CORE-OS (KI-Betriebssystem zur regelbasierten Situations-/Ereigniserkennung, z. B. Sturz- und Präsenzerkennung per Radar, Notfallalarmierung) und CORE-ACCESS (Portal zur Verwaltung mehrerer Installationen). Alles wird am Rand (Edge) lokal verarbeitet — Rohdaten bleiben vor Ort, keine Cloud-Pflicht. Märkte: Altenpflege, betreutes Wohnen, Assistenz für Menschen mit Behinderung, Notfallerkennung, Gebäudeautomation/Energieeffizienz, Wohnungswirtschaft. Technologien & Partner: Radarsensorik, Funkprotokolle EnOcean/ELDAT-EasyWave/MQTT, offene Architektur; Hardware-/Sensorpartner u. a. Hikvision, Shelly, EnOcean Alliance, DEUTA Controls, Wissner-Bosserhoff. Positionierung: „Lokal. Sicher. Partnerorientiert.“ — Datensouveränität, Interoperabilität, Technik die Pflegekräfte entlastet statt ersetzt. Relevante Treiber: demografischer Wandel & Pflegekräftemangel, DSGVO/Datenschutz, Pflegekassen-Förderung, EU Cyber Resilience Act, Lieferketten-/Sanktionsrisiken (z. B. chinesische Sensorik).",
   "queries": [
     "Pflege Digitalisierung Förderung Deutschland",
-    "Pflegekräftemangel Pflege Technik Entlastung",
+    "Pflegekräftemangel Entlastung Technik",
     "Ambient Assisted Living betreutes Wohnen Technik",
-    "Sturzerkennung Radar Pflege",
+    "Sturzerkennung Radar Sensorik Pflege",
     "Hikvision EU Sanktionen Überwachungstechnik",
     "Cyber Resilience Act vernetzte Geräte IoT",
     "EnOcean Matter Smart Home Standard",
     "DSGVO Gesundheitsdaten Pflege Datenschutz",
-    "Smart Building Energiemonitoring Wohnungswirtschaft"
+    "Smart Building Energiemonitoring Wohnungswirtschaft",
+    "Pflegeversicherung Reform Prävention",
+    "Pflegeheim Betreiber Digitalisierung Partnerschaft",
+    "AAL Förderprogramm EU Horizon altersgerecht",
+    "demografischer Wandel Pflegebedürftige Prognose",
+    "Krankenkasse Erstattung digitale Pflegehilfen DiPA",
+    "Cybersecurity Krankenhaus Pflegeeinrichtung Angriff",
+    "Halbleiter Sensoren Lieferengpass Beschaffung",
+    "EU AI Act Medizin Gesundheit Vorgaben",
+    "Wettbewerber Smart Care Startup Finanzierung",
+    "altersgerechtes Wohnen Quartier Kommune Projekt",
+    "edge computing lokale Datenverarbeitung Gesundheit"
   ],
   "models": {
     "triage": "claude-haiku-4-5",
     "analysis": "claude-opus-4-8"
   },
   "limits": {
-    "maxTriage": 30,
-    "maxAnalyze": 6,
-    "keep": 400
+    "maxTriage": 60,
+    "maxAnalyze": 20,
+    "keep": 600
   }
 }

@@ -24,25 +24,32 @@
 
   <main class="wrap">
     <section id="kpis" class="kpis"></section>
-    <section class="panel spectrum-panel">
-      <div class="panel-h"><h2>Chancen–Risiko-Spektrum</h2><span class="hint">Jeder Punkt = ein bewertetes Ereignis · Achse −1 Risiko … +1 Chance</span></div>
-      <div id="spectrum" class="spectrum"></div>
+
+    <section class="panel">
+      <div class="panel-h">
+        <h2>Chancen-/Risiko-Matrix</h2>
+        <span class="hint">x = Risiko ↔ Chance · y = Gewissheit · <strong>über einen Punkt fahren</strong> blendet die übrigen aus</span>
+      </div>
+      <div id="chart"></div>
     </section>
 
     <section class="controls">
-      <div id="filters" class="chips"></div>
+      <div class="legend">
+        <span class="lg lg-risk">Risiken</span>
+        <span class="lg lg-neutral">Neutral</span>
+        <span class="lg lg-opp">Chancen</span>
+      </div>
       <div class="sort">
         <label for="sort">Sortierung</label>
         <select id="sort">
-          <option value="recent">Neueste zuerst</option>
           <option value="impact">Stärkster Einfluss</option>
-          <option value="opp">Beste Chancen</option>
-          <option value="risk">Größte Risiken</option>
+          <option value="recent">Neueste zuerst</option>
+          <option value="certainty">Höchste Gewissheit</option>
         </select>
       </div>
     </section>
 
-    <section id="feed" class="feed"></section>
+    <section id="columns" class="columns"></section>
 
     <details class="about">
       <summary>Wie funktioniert das Radar?</summary>
@@ -51,11 +58,12 @@
         Heise bündelt) zu den für uCORE relevanten Themen abgefragt. Ein schnelles, günstiges Modell
         (<strong>Claude Haiku</strong>) filtert vor, welche Schlagzeilen das Geschäftsmodell überhaupt berühren
         könnten. Die relevanten Fälle bewertet anschließend ein starkes Modell (<strong>Claude Opus</strong>):
-        es vergibt einen Einfluss-Faktor von <strong>−1 (Risiko)</strong> bis <strong>+1 (Chance)</strong> und
-        begründet, inwiefern das Ereignis das Geschäftsmodell betrifft.</p>
+        es vergibt einen Einfluss-Faktor von <strong>−1 (Risiko)</strong> bis <strong>+1 (Chance)</strong>,
+        schätzt die <strong>Gewissheit</strong> der Einordnung und begründet, inwiefern das Ereignis das
+        Geschäftsmodell betrifft.</p>
         <p>Bewusst werden nicht nur „gut“ und „schlecht“ gezeigt: auch scheinbar nebensächliche Ereignisse landen
-        mit einem Faktor nahe 0 im Radar — dort, wo sonst schwache Signale übersehen werden. Jede Bewertung ist
-        eine Einschätzung mit Konfidenzangabe und sollte kritisch geprüft werden.</p>
+        in der mittleren Spalte — dort, wo sonst schwache Signale übersehen werden. Jede Bewertung ist eine
+        Einschätzung und sollte kritisch geprüft werden.</p>
       </div>
     </details>
   </main>
