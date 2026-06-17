@@ -1,23 +1,24 @@
-/* Hourly scan pipeline (runs in GitHub Actions).
-   1. Collect fresh headlines from Google News RSS (profile-driven queries).
-   2. Dedupe against the datastore.
-   3. Haiku triage — cheap relevance filter.
-   4. Opus analysis — for the relevant few: impact factor (-1 risk … +1 chance) + reasoning.
-   5. Append to data/news.json and let the workflow commit it.
+/* Hourly multi-tenant scan pipeline (runs in GitHub Actions).
+   For each tenant in config/tenants.json:
+     1. Collect fresh headlines from Google News RSS (tenant queries).
+     2. Dedupe against that tenant's datastore.
+     3. Haiku triage — cheap relevance filter (per tenant business model).
+     4. Opus analysis — impact factor (-1 risk … +1 chance) + reasoning + confidence.
+     5. Append to data/<tenantId>.json (the workflow commits it).
 
-   The Anthropic API key comes from the ANTHROPIC_API_KEY env (GitHub Actions secret);
-   it is never shipped to the browser. */
+   ANTHROPIC_API_KEY comes from the GitHub Actions secret; never shipped to the browser. */
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { collectHeadlines, keyOf } from "./sources.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const PROFILE = JSON.parse(await fs.readFile(path.join(ROOT, "config/profile.json"), "utf8"));
-const DB_PATH = path.join(ROOT, "data/news.json");
-
+const CFG = JSON.parse(await fs.readFile(path.join(ROOT, "config/tenants.json"), "utf8"));
 const KEY = process.env.ANTHROPIC_API_KEY;
 if (!KEY) { console.error("ANTHROPIC_API_KEY is not set."); process.exit(1); }
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const textOf = (d) => (d.content || []).filter((b) => b.type === "text").map((b) => b.text).join("");
 
 async function anthropic(body, attempt = 0) {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -32,8 +33,6 @@ async function anthropic(body, attempt = 0) {
   if (!res.ok) throw new Error(`${res.status}: ${data?.error?.message || "API error"}`);
   return data;
 }
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const textOf = (d) => (d.content || []).filter((b) => b.type === "text").map((b) => b.text).join("");
 
 function extractJSON(t) {
   if (!t) return null;
@@ -52,18 +51,15 @@ function extractJSON(t) {
   return null;
 }
 
-/* ---- Haiku: fast relevance triage over many headlines, one cheap call. ---- */
-async function triage(cands) {
+async function triage(model, businessModel, cands) {
   const list = cands.map((c, i) => `${i}. ${c.title}${c.snippet ? " — " + c.snippet : ""}`).join("\n");
   const data = await anthropic({
-    model: PROFILE.models.triage,
-    max_tokens: 1024,
+    model, max_tokens: 1024,
     system:
-      "Du bist ein schneller Vorfilter für ein strategisches Marktradar. UNTERNEHMEN:\n" +
-      PROFILE.businessModel +
+      "Du bist ein schneller Vorfilter für ein strategisches Marktradar. UNTERNEHMEN:\n" + businessModel +
       "\n\nAUFGABE: Wähle aus der Liste NUR die Schlagzeilen, die plausibel die Chancen oder Risiken dieses " +
       "Unternehmens berühren (Markt, Regulierung, Technologie, Lieferkette, Wettbewerb, Förderung, Nachfrage). " +
-      "Sei selektiv — im Zweifel weglassen. Antworte ausschließlich als JSON: {\"relevant\":[indizes]}.",
+      "Sei selektiv. Antworte ausschließlich als JSON: {\"relevant\":[indizes]}.",
     messages: [{ role: "user", content: "Schlagzeilen:\n" + list }]
   });
   const j = extractJSON(textOf(data)) || {};
@@ -72,29 +68,27 @@ async function triage(cands) {
 }
 
 const ANALYSIS_SCHEMA = {
-  type: "object",
-  additionalProperties: false,
+  type: "object", additionalProperties: false,
   properties: {
     factor: { type: "number", description: "-1 (reines Risiko) bis +1 (reine Chance), 0 = neutral/ambivalent" },
     category: { type: "string", enum: ["risk", "neutral", "opportunity"] },
-    reasoning: { type: "string", description: "1-3 Sätze: inwiefern betrifft das konkret das Geschäftsmodell?" },
-    confidence: { type: "number", description: "0..1 Belastbarkeit der Einschätzung" }
+    reasoning: { type: "string", description: "1-3 Sätze: inwiefern betrifft das konkret das Geschäftsmodell? Keinen Firmennamen nennen, mit 'das Unternehmen'/'der Anbieter' formulieren." },
+    confidence: { type: "number", description: "0..1 Belastbarkeit der Einschätzung, UNABHÄNGIG vom Betrag des Faktors" }
   },
   required: ["factor", "category", "reasoning", "confidence"]
 };
 
-/* ---- Opus: precise per-item impact analysis (structured output). ---- */
-async function analyze(item) {
+async function analyze(model, businessModel, item) {
   const data = await anthropic({
-    model: PROFILE.models.analysis,
-    max_tokens: 1200,
+    model, max_tokens: 1200,
     output_config: { effort: "medium", format: { type: "json_schema", schema: ANALYSIS_SCHEMA } },
     system:
       "Du bewertest ein einzelnes Nachrichtenereignis für das strategische Marktradar eines Unternehmens. " +
-      "UNTERNEHMEN:\n" + PROFILE.businessModel +
+      "UNTERNEHMEN:\n" + businessModel +
       "\n\nGib einen Einfluss-Faktor von -1 (Risiko) bis +1 (Chance) und eine kurze, konkrete Begründung, " +
-      "inwiefern das Ereignis das Geschäftsmodell betrifft. Vermeide trügerische Sicherheit: wenn die " +
-      "Relevanz nur mittelbar ist, wähle einen Faktor nahe 0 und benenne die Unsicherheit. Antworte als JSON.",
+      "inwiefern das Ereignis das Geschäftsmodell betrifft. Nenne KEINEN Firmennamen; formuliere mit " +
+      "'das Unternehmen'/'der Anbieter'. Die Gewissheit (confidence) ist UNABHÄNGIG vom Betrag des Faktors. " +
+      "Vermeide trügerische Sicherheit: ist die Relevanz nur mittelbar, wähle einen Faktor nahe 0. Antworte als JSON.",
     messages: [{ role: "user", content:
       `Titel: ${item.title}\nQuelle: ${item.source}\nDatum: ${item.publishedAt || "?"}\n` +
       (item.snippet ? `Auszug: ${item.snippet}\n` : "") + `Link: ${item.url}` }]
@@ -103,74 +97,64 @@ async function analyze(item) {
   if (!j) return null;
   let factor = Math.max(-1, Math.min(1, Number(j.factor)));
   if (!Number.isFinite(factor)) factor = 0;
-  const category = ["risk", "neutral", "opportunity"].includes(j.category)
-    ? j.category : factor > 0.2 ? "opportunity" : factor < -0.2 ? "risk" : "neutral";
+  const category = factor >= 0.2 ? "opportunity" : factor <= -0.2 ? "risk" : "neutral";
   return {
-    factor: Math.round(factor * 100) / 100,
-    category,
+    factor: Math.round(factor * 100) / 100, category,
     reasoning: String(j.reasoning || "").trim(),
     confidence: Math.max(0, Math.min(1, Number(j.confidence) || 0.5))
   };
 }
 
-async function main() {
-  const db = JSON.parse(await fs.readFile(DB_PATH, "utf8").catch(() => '{"items":[]}'));
+async function scanTenant(t) {
+  const dbPath = path.join(ROOT, "data", t.id + ".json");
+  const db = JSON.parse(await fs.readFile(dbPath, "utf8").catch(() => '{"items":[]}'));
   db.items = Array.isArray(db.items) ? db.items : [];
   const seen = new Set(db.items.map((it) => it.key));
 
-  console.log(`[scan] collecting headlines for ${PROFILE.queries.length} queries…`);
-  const headlines = await collectHeadlines(PROFILE.queries);
-
-  // Dedupe by title key (within batch + against datastore).
-  const fresh = [];
-  const batch = new Set();
+  const headlines = await collectHeadlines(t.queries);
+  const fresh = [], batch = new Set();
   for (const h of headlines) {
     const k = keyOf(h.title);
     if (!k || seen.has(k) || batch.has(k)) continue;
-    batch.add(k);
-    fresh.push({ ...h, key: k });
+    batch.add(k); fresh.push({ ...h, key: k });
   }
-  console.log(`[scan] ${headlines.length} headlines, ${fresh.length} new after dedupe.`);
-  if (!fresh.length) { console.log("[scan] nothing new."); return; }
+  console.log(`[${t.id}] ${headlines.length} headlines, ${fresh.length} new.`);
+  if (!fresh.length) return;
 
-  const cands = fresh.slice(0, PROFILE.limits.maxTriage);
-  const relevant = await triage(cands);
-  console.log(`[scan] Haiku flagged ${relevant.length} relevant.`);
-  if (!relevant.length) { console.log("[scan] none relevant."); return; }
+  const cands = fresh.slice(0, CFG.limits.maxTriage);
+  const relevant = await triage(CFG.models.triage, t.businessModel, cands);
+  console.log(`[${t.id}] Haiku flagged ${relevant.length} relevant.`);
+  if (!relevant.length) return;
 
-  const toAnalyze = relevant.slice(0, PROFILE.limits.maxAnalyze);
+  const toAnalyze = relevant.slice(0, CFG.limits.maxAnalyze);
   const nowIso = new Date().toISOString();
   let added = 0;
   for (const item of toAnalyze) {
     try {
-      const a = await analyze(item);
+      const a = await analyze(CFG.models.analysis, t.businessModel, item);
       if (!a) continue;
       db.items.unshift({
-        id: item.key + "-" + Date.now().toString(36),
-        key: item.key,
-        title: item.title,
-        url: item.url,
-        source: item.source,
-        publishedAt: item.publishedAt,
-        scannedAt: nowIso,
-        factor: a.factor,
-        category: a.category,
-        reasoning: a.reasoning,
-        confidence: a.confidence,
-        model: PROFILE.models.analysis
+        id: item.key.slice(0, 12).replace(/\s/g, "-") + "-" + Date.now().toString(36),
+        key: item.key, title: item.title, url: item.url, source: item.source,
+        publishedAt: item.publishedAt, scannedAt: nowIso,
+        factor: a.factor, category: a.category, reasoning: a.reasoning,
+        confidence: a.confidence, model: CFG.models.analysis
       });
       added++;
-      console.log(`  + [${a.factor >= 0 ? "+" : ""}${a.factor}] ${item.title}`);
-    } catch (e) { console.warn(`  ! analysis failed: ${item.title} — ${e.message}`); }
+      console.log(`  [${t.id}] + [${a.factor >= 0 ? "+" : ""}${a.factor}] ${item.title}`);
+    } catch (e) { console.warn(`  [${t.id}] ! ${item.title} — ${e.message}`); }
   }
-
-  if (!added) { console.log("[scan] nothing added."); return; }
+  if (!added) return;
   db.items.sort((a, b) => new Date(b.scannedAt) - new Date(a.scannedAt));
-  if (db.items.length > PROFILE.limits.keep) db.items = db.items.slice(0, PROFILE.limits.keep);
+  if (db.items.length > CFG.limits.keep) db.items = db.items.slice(0, CFG.limits.keep);
   db.updatedAt = nowIso;
-  db.company = PROFILE.company;
-  await fs.writeFile(DB_PATH, JSON.stringify(db, null, 2) + "\n");
-  console.log(`[scan] wrote ${added} new item(s); ${db.items.length} total.`);
+  await fs.writeFile(dbPath, JSON.stringify(db, null, 2) + "\n");
+  console.log(`[${t.id}] wrote ${added} new item(s); ${db.items.length} total.`);
 }
 
+async function main() {
+  for (const t of CFG.tenants) {
+    try { await scanTenant(t); } catch (e) { console.error(`[${t.id}] failed: ${e.message}`); }
+  }
+}
 main().catch((e) => { console.error(e); process.exit(1); });

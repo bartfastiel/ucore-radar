@@ -31,8 +31,8 @@ jobs:
         run: |
           git config user.name "ucore-radar-bot"
           git config user.email "actions@github.com"
-          if [[ -n "$(git status --porcelain data/news.json)" ]]; then
-            git add data/news.json
+          if [[ -n "$(git status --porcelain data/)" ]]; then
+            git add data/
             git commit -m "radar: update market signals ($(date -u +%Y-%m-%dT%H:%MZ))"
             git push
           else

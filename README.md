@@ -1,10 +1,12 @@
-# uCORE Marktradar
+# Marktradar
 
-Ein fokussiertes Werkzeug, das für ein Startup — hier am Beispiel **uCORE Systems GmbH** — laufend bewertet,
-wie sich **Chancen und Risiken durch aktuelle Ereignisse** verändern.
+Ein **multi-tenant**-Werkzeug, das für mehrere Unternehmen laufend bewertet, wie sich **Chancen und Risiken
+durch aktuelle Ereignisse** verändern. Die Unternehmen werden bewusst nur **umschrieben** (Branche/Profil),
+nicht namentlich genannt.
 
 Stündlich werden Nachrichtenquellen gescannt; jedes relevante Ereignis bekommt einen Einfluss-Faktor von
-**−1 (Risiko)** bis **+1 (Chance)** und eine kurze Begründung, **inwiefern es das Geschäftsmodell betrifft**.
+**−1 (Risiko)** bis **+1 (Chance)**, eine **Gewissheit** und eine kurze Begründung, **inwiefern es das
+Geschäftsmodell betrifft**.
 
 👉 **Live:** <https://bartfastiel.github.io/ucore-radar/>
 
@@ -12,19 +14,22 @@ Stündlich werden Nachrichtenquellen gescannt; jedes relevante Ereignis bekommt 
 
 ```
             ┌── GitHub Actions (stündlicher Cron, kostenlos) ──────────────┐
-            │  1. Google-News-RSS zu uCORE-Themen abrufen (dpa, Reuters…)  │
+            │  Pro Unternehmen (Tab):                                      │
+            │  1. Google-News-RSS zu den Profil-Themen abrufen (dpa …)     │
             │  2. Claude Haiku  → schneller, günstiger Relevanz-Vorfilter  │
             │  3. Claude Opus   → genaue Analyse: Faktor −1…+1 + Begründung│
-            │  4. Ergebnis in data/news.json schreiben & committen         │
+            │  4. Ergebnis in data/<tenant>.json schreiben & committen     │
             └───────────────────────────┬─────────────────────────────────┘
                                          ▼
-              GitHub Pages serviert das Dashboard (liest data/news.json)
+         GitHub Pages serviert das Dashboard (Tabs lesen data/<tenant>.json)
 ```
 
+- **Multi-tenant:** mehrere Unternehmen als Tabs; jedes mit eigenem Profil, eigenen Suchanfragen und
+  eigenem Datenspeicher. Die Unternehmen sind nur umschrieben, nicht namentlich genannt.
 - **Zweistufig & kostenbewusst:** Das günstige Modell (Haiku) filtert die Masse vor; nur die wenigen
   relevanten Treffer gehen an das starke Modell (Opus). So bleiben die Kosten pro Stunde minimal.
-- **Persistenz:** Die Bewertungen liegen versioniert in `data/news.json` — jede Stunde ein nachvollziehbarer
-  Commit (die „Datenbank“ ist Teil des Repos, kein Server nötig).
+- **Persistenz:** Die Bewertungen liegen versioniert in `data/<tenant>.json` — jede Stunde ein
+  nachvollziehbarer Commit (die „Datenbank“ ist Teil des Repos, kein Server nötig).
 - **Datensatz je Ereignis:** Link, Titel, Quelle, Datum, **Faktor (−1…+1)**, Kategorie, **Begründung** und
   Konfidenz.
 - **Schwache Signale sichtbar:** Auch scheinbar nebensächliche Meldungen landen mit Faktor nahe 0 im Radar,
@@ -54,27 +59,28 @@ wird nie an den Browser ausgeliefert.
    ```
    Danach läuft der Scan automatisch stündlich. Manuell jederzeit über den **Actions**-Tab → *Run workflow*.
 
-Ohne Key tut der Cron nichts; das Dashboard zeigt dann die mitgelieferten **Startwerte** (`seed`), bis die
-ersten Live-Bewertungen eintreffen.
+Ohne Key tut der Cron nichts; das Dashboard zeigt dann die mitgelieferten Bewertungen, bis die ersten
+neuen Live-Treffer eintreffen.
 
-## Unternehmensprofil anpassen
+## Unternehmen anpassen / ergänzen
 
-Alles Unternehmensspezifische steht zentral in [`config/profile.json`](config/profile.json):
-Beschreibung/Geschäftsmodell (für die KI-Bewertung), die **Suchanfragen** (`queries`), die Modelle
-(`triage` = Haiku, `analysis` = Opus) und Limits. uCORE ist dort fix hinterlegt.
+Alle Unternehmen (Tenants) stehen zentral in [`config/tenants.json`](config/tenants.json): je Tenant
+`id`, Anzeigename (umschrieben), `subtitle`, `businessModel` (für die KI-Bewertung) und die **Suchanfragen**
+(`queries`); dazu global die Modelle (`triage` = Haiku, `analysis` = Opus) und Limits. Ein neues Unternehmen
+= ein weiterer Eintrag im Array (der Scan legt dann `data/<id>.json` an).
 
 ## Struktur
 
 ```
-config/profile.json          fixes Unternehmensprofil + Suchanfragen + Modelle
+config/tenants.json          Unternehmen (umschrieben) + Suchanfragen + Modelle/Limits
 scripts/sources.mjs          Google-News-RSS abrufen & parsen (zero-dependency)
-scripts/scan.mjs             Pipeline: Triage (Haiku) → Analyse (Opus) → data/news.json
+scripts/scan.mjs             Pipeline pro Tenant: Triage (Haiku) → Analyse (Opus) → data/<id>.json
 .github/workflows/scan.yml   stündlicher Cron + manueller Trigger
-data/news.json               versionierter Datenspeicher der Bewertungen
-index.html · css · js/app.js Dashboard (liest data/news.json, kein API-Key im Browser)
+data/<id>.json               versionierter Datenspeicher je Unternehmen
+index.html · css · js/app.js Dashboard mit Tabs (liest data/<id>.json, kein API-Key im Browser)
 ```
 
 ## Modelle
 
 `claude-haiku-4-5` (Vorfilter) und `claude-opus-4-8` (Analyse, mit Structured Outputs für robustes JSON).
-Anpassbar in `config/profile.json`.
+Anpassbar in `config/tenants.json`.

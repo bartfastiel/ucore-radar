@@ -1,17 +1,16 @@
-/* uCORE Marktradar — frontend. Reads config/profile.json and the data/news.json datastore
-   (produced hourly by the GitHub Actions scan). Renders KPIs, a Chance/Risk × Certainty
-   scatter matrix, and three columns (Risiken | Neutral | Chancen). Hovering a point in the
-   matrix isolates that single event in the columns below. No API key in the browser. */
+/* Marktradar — multi-tenant frontend. Loads config/tenants.json, renders a tenant tab bar,
+   and per tenant reads data/<id>.json. Per tenant: KPIs, a Chance/Risk × Certainty scatter
+   matrix (hover a point isolates that event below), and three columns (Risiken|Neutral|Chancen).
+   No API key in the browser — the dashboard is purely a reader. */
 (function () {
   const $ = (s, r) => (r || document).querySelector(s);
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-  let DATA = { items: [] }, SORT = "impact", focusId = null, pinnedId = null;
+  let TENANTS = [], TENANT = null, DATA = { items: [] }, SORT = "impact", focusId = null, pinnedId = null;
 
   const isOpp = (f) => f >= 0.2, isRisk = (f) => f <= -0.2, isNeutral = (f) => f > -0.2 && f < 0.2;
   const catOf = (it) => isOpp(it.factor) ? "opportunity" : isRisk(it.factor) ? "risk" : "neutral";
-
   function factorColor(f) {
     if (f >= 0.2) { const t = Math.min(1, (f - 0.2) / 0.8); return `hsl(140, ${45 + t * 25}%, ${44 - t * 6}%)`; }
     if (f <= -0.2) { const t = Math.min(1, (-f - 0.2) / 0.8); return `hsl(6, ${50 + t * 25}%, ${54 - t * 8}%)`; }
@@ -19,7 +18,6 @@
   }
   const catLabel = (c) => ({ risk: "Risiko", neutral: "Neutral", opportunity: "Chance" }[c]);
   const fmtFactor = (f) => (f > 0 ? "+" : "") + f.toFixed(2);
-
   function relTime(iso) {
     if (!iso) return "";
     const d = new Date(iso), s = (Date.now() - d) / 1000;
@@ -30,20 +28,35 @@
     return d.toLocaleDateString("de-DE", { day: "2-digit", month: "short" });
   }
 
-  async function load() {
-    const bust = "?t=" + Date.now();
-    try {
-      const [profile, data] = await Promise.all([
-        fetch("config/profile.json" + bust).then((r) => r.json()).catch(() => null),
-        fetch("data/news.json" + bust).then((r) => r.json()).catch(() => null)
-      ]);
-      if (profile) {
-        $("#company").textContent = profile.company || "Marktradar";
-        $("#subtitle").textContent = profile.subtitle || profile.tagline || "";
-        document.title = (profile.company || "Marktradar") + " · " + (profile.tagline || "Marktradar");
-      }
-      DATA = data && Array.isArray(data.items) ? data : { items: [] };
-    } catch (e) { DATA = { items: [] }; }
+  async function init() {
+    let cfg = null;
+    try { cfg = await fetch("config/tenants.json?t=" + Date.now()).then((r) => r.json()); } catch (e) {}
+    TENANTS = (cfg && Array.isArray(cfg.tenants)) ? cfg.tenants : [];
+    renderTenantTabs();
+    const start = (location.hash || "").replace("#", "");
+    const chosen = TENANTS.find((t) => t.id === start) || TENANTS[0];
+    if (chosen) await selectTenant(chosen.id);
+  }
+
+  function renderTenantTabs() {
+    const nav = $("#tenants");
+    nav.innerHTML = TENANTS.map((t) =>
+      `<button class="t-tab" data-id="${esc(t.id)}">${esc(t.tab || t.name)}</button>`).join("");
+    nav.querySelectorAll(".t-tab").forEach((b) => b.onclick = () => selectTenant(b.dataset.id));
+  }
+
+  async function selectTenant(id) {
+    TENANT = TENANTS.find((t) => t.id === id) || TENANTS[0];
+    if (!TENANT) return;
+    focusId = null; pinnedId = null;
+    document.querySelectorAll(".t-tab").forEach((b) => b.classList.toggle("active", b.dataset.id === TENANT.id));
+    $("#company").textContent = TENANT.name;
+    $("#subtitle").textContent = TENANT.subtitle || "Marktradar";
+    document.title = TENANT.name + " · Marktradar";
+    history.replaceState(null, "", "#" + TENANT.id);
+    try { DATA = await fetch("data/" + TENANT.id + ".json?t=" + Date.now()).then((r) => r.json()); }
+    catch (e) { DATA = { items: [] }; }
+    if (!DATA || !Array.isArray(DATA.items)) DATA = { items: [] };
     render();
   }
 
@@ -81,14 +94,13 @@
       </div>`;
   }
 
-  /* --- Scatter matrix: x = factor (-1..+1), y = confidence (0..1) --- */
   function renderChart() {
     const host = $("#chart");
     if (!DATA.items.length) { host.innerHTML = `<p class="empty">Noch keine Ereignisse — der stündliche Scan füllt das Radar.</p>`; return; }
     const dots = DATA.items.map((it) => {
       const x = ((it.factor + 1) / 2) * 100;
       const y = Math.max(0, Math.min(1, it.confidence || 0.5)) * 100;
-      return `<button class="pt" role="listitem" data-id="${esc(it.id)}"
+      return `<button class="pt" data-id="${esc(it.id)}"
         style="left:${x}%;bottom:${y}%;background:${factorColor(it.factor)}"
         title="${esc(fmtFactor(it.factor) + " · Gewissheit " + Math.round((it.confidence || 0) * 100) + "% · " + it.title)}"></button>`;
     }).join("");
@@ -97,7 +109,7 @@
         <div class="y-axis"><span>Gewissheit</span></div>
         <div class="plot-wrap">
           <div class="y-ticks"><span>hoch</span><span>mittel</span><span>gering</span></div>
-          <div class="plot" role="list">
+          <div class="plot">
             <div class="grid-v"></div><div class="grid-h"></div>
             <div class="q q-tl">unsicher · Risiko</div><div class="q q-tr">sicher · Chance</div>
             ${dots}
@@ -120,15 +132,13 @@
     const t = (x) => new Date(x.scannedAt || x.publishedAt || 0).getTime();
     if (SORT === "recent") return arr.sort((a, b) => t(b) - t(a));
     if (SORT === "certainty") return arr.sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
-    return arr.sort((a, b) => Math.abs(b.factor) - Math.abs(a.factor)); // impact
+    return arr.sort((a, b) => Math.abs(b.factor) - Math.abs(a.factor));
   }
 
   function renderColumns() {
     const host = $("#columns");
     const act = activeId();
-    // highlight active point
     document.querySelectorAll(".pt").forEach((p) => p.classList.toggle("active", p.dataset.id === act));
-
     const defs = [
       { k: "risk", t: "Risiken", cls: "col-risk" },
       { k: "neutral", t: "Neutral", cls: "col-neutral" },
@@ -138,7 +148,6 @@
     const banner = act
       ? `<div class="focus-bar">Fokus auf 1 Ereignis — ${pinnedId ? "klick auf den Punkt löst die Auswahl" : "Maus vom Punkt nehmen blendet wieder alle ein"}.</div>`
       : "";
-
     host.innerHTML = banner + `<div class="cols">` + defs.map((d) => {
       const all = DATA.items.filter((i) => catOf(i) === d.k);
       const shown = sortItems(visible.filter((i) => catOf(i) === d.k));
@@ -152,12 +161,11 @@
   function card(it) {
     const col = factorColor(it.factor);
     const conf = it.confidence != null ? `<span class="conf" title="Gewissheit der Einschätzung">◑ ${Math.round(it.confidence * 100)}%</span>` : "";
-    const seed = it.seed ? `<span class="seed" title="Startwert – wird durch den Live-Scan ergänzt">Startwert</span>` : "";
     const when = relTime(it.publishedAt || it.scannedAt);
     return `<article class="card" data-id="${esc(it.id)}" style="--col:${col}">
       <div class="card-top">
         <span class="factor-pill" style="background:${col}">${fmtFactor(it.factor)}</span>
-        ${conf}${seed}<span class="grow"></span>
+        ${conf}<span class="grow"></span>
         <span class="src">${esc(it.source || "")} · ${esc(when)}</span>
       </div>
       <h4 class="card-title"><a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.title)}</a></h4>
@@ -166,6 +174,6 @@
     </article>`;
   }
 
-  if (document.readyState !== "loading") load();
-  else document.addEventListener("DOMContentLoaded", load);
+  if (document.readyState !== "loading") init();
+  else document.addEventListener("DOMContentLoaded", init);
 })();

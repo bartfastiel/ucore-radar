@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>uCORE Systems · Marktradar</title>
-  <meta name="description" content="Kontinuierliche Bewertung von Chancen und Risiken für uCORE Systems aus dem aktuellen Tagesgeschehen.">
+  <title>Marktradar · Chancen & Risiken aus dem Tagesgeschehen</title>
+  <meta name="description" content="Kontinuierliche Bewertung von Chancen und Risiken mehrerer Unternehmen aus dem aktuellen Tagesgeschehen.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📡</text></svg>">
   <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -14,13 +14,15 @@
       <div class="hd-brand">
         <span class="hd-logo">📡</span>
         <div>
-          <h1 id="company">uCORE Systems</h1>
+          <h1 id="company">Marktradar</h1>
           <p id="subtitle">Marktradar</p>
         </div>
       </div>
       <div class="hd-updated"><span class="dot live"></span><span id="updated">—</span></div>
     </div>
   </header>
+
+  <nav id="tenants" class="tenants" aria-label="Unternehmen"></nav>
 
   <main class="wrap">
     <section id="kpis" class="kpis"></section>
@@ -55,7 +57,7 @@
       <summary>Wie funktioniert das Radar?</summary>
       <div class="about-body">
         <p>Stündlich werden mehrere Nachrichtenquellen (über Google News, das u. a. dpa, Reuters, Handelsblatt und
-        Heise bündelt) zu den für uCORE relevanten Themen abgefragt. Ein schnelles, günstiges Modell
+        Heise bündelt) zu den für das jeweilige Unternehmen relevanten Themen abgefragt. Ein schnelles, günstiges Modell
         (<strong>Claude Haiku</strong>) filtert vor, welche Schlagzeilen das Geschäftsmodell überhaupt berühren
         könnten. Die relevanten Fälle bewertet anschließend ein starkes Modell (<strong>Claude Opus</strong>):
         es vergibt einen Einfluss-Faktor von <strong>−1 (Risiko)</strong> bis <strong>+1 (Chance)</strong>,

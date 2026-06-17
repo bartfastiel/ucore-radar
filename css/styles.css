@@ -1,4 +1,4 @@
-/* uCORE Marktradar — professional, calm, single-purpose. */
+/* Marktradar — professional, calm, multi-tenant. */
 :root{
   --bg:#0f1722; --card:#172636; --line:#22364a;
   --ink:#e8eef5; --muted:#93a4b7; --faint:#6c8097;
@@ -18,7 +18,7 @@ a:hover{text-decoration:underline}
 h1,h2,h3,h4{margin:0;line-height:1.2}
 
 /* Header */
-.hd{border-bottom:1px solid var(--line);background:rgba(15,23,34,.7);backdrop-filter:blur(8px);position:sticky;top:0;z-index:5}
+.hd{border-bottom:1px solid var(--line);background:rgba(15,23,34,.7);backdrop-filter:blur(8px)}
 .hd-inner{max-width:1180px;margin:0 auto;padding:16px 22px;display:flex;justify-content:space-between;align-items:center;gap:16px}
 .hd-brand{display:flex;align-items:center;gap:14px}
 .hd-logo{font-size:30px;filter:drop-shadow(0 0 10px rgba(43,212,192,.4))}
@@ -28,6 +28,14 @@ h1,h2,h3,h4{margin:0;line-height:1.2}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--faint)}
 .dot.live{background:var(--brand);animation:pulse 2.4s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(43,212,192,.5)}70%{box-shadow:0 0 0 7px rgba(43,212,192,0)}100%{box-shadow:0 0 0 0 rgba(43,212,192,0)}}
+
+/* Tenant tab bar */
+.tenants{position:sticky;top:0;z-index:4;display:flex;gap:6px;overflow-x:auto;
+  padding:8px 22px;background:rgba(15,23,34,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.t-tab{flex:0 0 auto;background:transparent;border:1px solid var(--line);color:var(--muted);
+  border-radius:20px;padding:7px 15px;cursor:pointer;font-size:13.5px;white-space:nowrap}
+.t-tab:hover{color:var(--ink);border-color:#33506b}
+.t-tab.active{background:var(--brand);color:#06231f;border-color:var(--brand);font-weight:600}
 
 .wrap{max-width:1180px;margin:0 auto;padding:22px 22px 60px}
 

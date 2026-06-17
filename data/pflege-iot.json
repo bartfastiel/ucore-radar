@@ -1,6 +1,5 @@
 {
-  "company": "uCORE Systems GmbH",
-  "updatedAt": "2026-06-16T22:01:04.162Z",
+  "updatedAt": "2026-06-17T07:02:09.856Z",
   "items": [
     {
       "id": "n001",
@@ -13,7 +12,7 @@
       "factor": -0.1,
       "confidence": 0.4,
       "category": "neutral",
-      "reasoning": "Der Fokus auf hybride Bedrohungen und kritische Infrastruktur erhöht regulatorische Erwartungen an Resilienz und Datensicherheit; uCOREs lokale Edge-Architektur passt grundsätzlich, schafft aber auch Compliance-Aufwand.",
+      "reasoning": "Der Fokus auf hybride Bedrohungen und kritische Infrastruktur erhöht regulatorische Erwartungen an Resilienz und Datensicherheit; des Spin-offs lokale Edge-Architektur passt grundsätzlich, schafft aber auch Compliance-Aufwand.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -27,7 +26,7 @@
       "factor": 0.05,
       "confidence": 0.5,
       "category": "neutral",
-      "reasoning": "Geopolitische Entspannung kann mittelbar Energie- und Lieferkettenkosten dämpfen, was uCOREs Hardware-Beschaffung leicht entlastet; direkter Pflegebezug fehlt jedoch.",
+      "reasoning": "Geopolitische Entspannung kann mittelbar Energie- und Lieferkettenkosten dämpfen, was des Spin-offs Hardware-Beschaffung leicht entlastet; direkter Pflegebezug fehlt jedoch.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -41,7 +40,7 @@
       "factor": 0,
       "confidence": 0.45,
       "category": "neutral",
-      "reasoning": "Eine verschärfte gesellschaftliche und regulatorische KI-Debatte trifft mittelbar auch sensorbasierte Assistenzsysteme (Datenschutz, Transparenz), ohne uCOREs aktuelles Geschäft direkt zu betreffen.",
+      "reasoning": "Eine verschärfte gesellschaftliche und regulatorische KI-Debatte trifft mittelbar auch sensorbasierte Assistenzsysteme (Datenschutz, Transparenz), ohne des Spin-offs aktuelles Geschäft direkt zu betreffen.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -55,7 +54,7 @@
       "factor": 0.2,
       "confidence": 0.55,
       "category": "opportunity",
-      "reasoning": "Sinkende Energiepreise senken Betriebs- und Logistikkosten von uCORE und stärken die Investitionskraft der Kunden (Pflege, Wohnungswirtschaft), für die Energiekosten ein Budgetfaktor sind.",
+      "reasoning": "Sinkende Energiepreise senken Betriebs- und Logistikkosten von das Spin-off und stärken die Investitionskraft der Kunden (Pflege, Wohnungswirtschaft), für die Energiekosten ein Budgetfaktor sind.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -97,7 +96,7 @@
       "factor": 0.3,
       "confidence": 0.7,
       "category": "opportunity",
-      "reasoning": "Konkretes deutsches Pilotprojekt (DRK Chemnitz) validiert kontaktlose Radar-Sensorik in Pflegeheimen als marktreif; ambivalent, weil der Wettbewerber Daten in einer EU-Cloud verarbeitet statt lokal – was uCOREs Edge-/Souveränitäts-Differenzierer schärft.",
+      "reasoning": "Konkretes deutsches Pilotprojekt (DRK Chemnitz) validiert kontaktlose Radar-Sensorik in Pflegeheimen als marktreif; ambivalent, weil der Wettbewerber Daten in einer EU-Cloud verarbeitet statt lokal – was des Spin-offs Edge-/Souveränitäts-Differenzierer schärft.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -111,7 +110,7 @@
       "factor": -0.3,
       "confidence": 0.55,
       "category": "risk",
-      "reasoning": "Höhere Zinsen verteuern Finanzierung und Investitionen in Wohnungswirtschaft/Pflegeimmobilien und können Hardware-Rollouts bremsen; als kapitalintensives Tech-Geschäft ist uCORE finanzierungsseitig betroffen.",
+      "reasoning": "Höhere Zinsen verteuern Finanzierung und Investitionen in Wohnungswirtschaft/Pflegeimmobilien und können Hardware-Rollouts bremsen; als kapitalintensives Tech-Geschäft ist das Spin-off finanzierungsseitig betroffen.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -125,7 +124,7 @@
       "factor": -0.7,
       "confidence": 0.8,
       "category": "risk",
-      "reasoning": "uCORE baut Edge-Hardware mit Speicher/Chips; die durch den KI-Boom ausgelöste DRAM-Knappheit verteuert direkt die Stückkosten und gefährdet die Verfügbarkeit von DDR/LPDDR bis 2027/28.",
+      "reasoning": "das Spin-off baut Edge-Hardware mit Speicher/Chips; die durch den KI-Boom ausgelöste DRAM-Knappheit verteuert direkt die Stückkosten und gefährdet die Verfügbarkeit von DDR/LPDDR bis 2027/28.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -153,7 +152,7 @@
       "factor": 0.4,
       "confidence": 0.6,
       "category": "opportunity",
-      "reasoning": "uCOREs KI im Pflegekontext fällt potenziell unter Hochrisiko-Kategorien; die Fristverschiebung verschafft mehr Zeit für Compliance und senkt kurzfristigen Regulierungsdruck.",
+      "reasoning": "des Spin-offs KI im Pflegekontext fällt potenziell unter Hochrisiko-Kategorien; die Fristverschiebung verschafft mehr Zeit für Compliance und senkt kurzfristigen Regulierungsdruck.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -167,7 +166,7 @@
       "factor": 0.6,
       "confidence": 0.75,
       "category": "opportunity",
-      "reasoning": "Der PNOG-Entwurf sieht 1,6 Mrd. EUR (2027-2031) explizit auch für 'Assistenzsysteme zur Entlastung des Pflegepersonals' vor – genau uCOREs Produktkategorie; größte mittelfristige Förderchance, Mittelabfluss aber erst ab 2027.",
+      "reasoning": "Der PNOG-Entwurf sieht 1,6 Mrd. EUR (2027-2031) explizit auch für 'Assistenzsysteme zur Entlastung des Pflegepersonals' vor – genau des Spin-offs Produktkategorie; größte mittelfristige Förderchance, Mittelabfluss aber erst ab 2027.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -195,7 +194,7 @@
       "factor": 0.5,
       "confidence": 0.55,
       "category": "opportunity",
-      "reasoning": "Matter 1.6 führt einen Ambient-Context-Sensor mit nativer Radar-Präsenz und Sturzerkennung ein; standardisierte Interoperabilität für uCOREs Radar-/Funksensorik senkt Integrationskosten und öffnet Multivendor-Beschaffung.",
+      "reasoning": "Matter 1.6 führt einen Ambient-Context-Sensor mit nativer Radar-Präsenz und Sturzerkennung ein; standardisierte Interoperabilität für des Spin-offs Radar-/Funksensorik senkt Integrationskosten und öffnet Multivendor-Beschaffung.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -223,7 +222,7 @@
       "factor": -0.2,
       "confidence": 0.5,
       "category": "risk",
-      "reasoning": "Der Reformentwurf streicht u. a. den Entlastungsbetrag in Pflegegrad 1 – das beschneidet Budgets, über die uCORE-Lösungen privat gefördert werden könnten; finaler Umfang noch unsicher.",
+      "reasoning": "Der Reformentwurf streicht u. a. den Entlastungsbetrag in Pflegegrad 1 – das beschneidet Budgets, über die das Spin-off-Lösungen privat gefördert werden könnten; finaler Umfang noch unsicher.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -237,7 +236,7 @@
       "factor": 0.5,
       "confidence": 0.6,
       "category": "opportunity",
-      "reasoning": "Sicherheits-/Sensorikanwendungen und Interoperabilitätsstandards wie Matter sind direkt anschlussfähig an uCOREs Radar-/Funksensorik in betreutem Wohnen und Wohnungswirtschaft; der wachsende Bestandsmarkt bietet Nachrüst-Potenzial.",
+      "reasoning": "Sicherheits-/Sensorikanwendungen und Interoperabilitätsstandards wie Matter sind direkt anschlussfähig an des Spin-offs Radar-/Funksensorik in betreutem Wohnen und Wohnungswirtschaft; der wachsende Bestandsmarkt bietet Nachrüst-Potenzial.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -251,7 +250,7 @@
       "factor": 0.4,
       "confidence": 0.55,
       "category": "opportunity",
-      "reasoning": "Forschung kombiniert Radar-Sturzerkennung mit explizit lokaler, datenschutzwahrender Verarbeitung und bestätigt uCOREs Kernthese, dass Edge-Verarbeitung der richtige Weg ist; gedämpft durch frühen Forschungsstand und US-Kontext.",
+      "reasoning": "Forschung kombiniert Radar-Sturzerkennung mit explizit lokaler, datenschutzwahrender Verarbeitung und bestätigt des Spin-offs Kernthese, dass Edge-Verarbeitung der richtige Weg ist; gedämpft durch frühen Forschungsstand und US-Kontext.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -293,7 +292,7 @@
       "factor": 0.3,
       "confidence": 0.7,
       "category": "opportunity",
-      "reasoning": "Der Datenabfluss von ~95.000 Patientendatensätzen über einen zentralen Cloud-Dienstleister unterstreicht das Risiko zentraler Datenhaltung – uCOREs lokale Edge-Architektur ist das werbewirksame Gegenmodell.",
+      "reasoning": "Der Datenabfluss von ~95.000 Patientendatensätzen über einen zentralen Cloud-Dienstleister unterstreicht das Risiko zentraler Datenhaltung – des Spin-offs lokale Edge-Architektur ist das werbewirksame Gegenmodell.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -307,7 +306,7 @@
       "factor": 0.4,
       "confidence": 0.82,
       "category": "opportunity",
-      "reasoning": "Bestätigt uCOREs Kernthese (Verknüpfung Wohnen/Energie/Gesundheit, Wohnungswirtschaft als Intermediär) als Markttrend; zugleich entsteht mit dem Materna/ZVEI-getragenen Datenraum eine potenzielle Plattformschicht zum Andocken oder Konkurrieren.",
+      "reasoning": "Bestätigt des Spin-offs Kernthese (Verknüpfung Wohnen/Energie/Gesundheit, Wohnungswirtschaft als Intermediär) als Markttrend; zugleich entsteht mit dem Materna/ZVEI-getragenen Datenraum eine potenzielle Plattformschicht zum Andocken oder Konkurrieren.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -321,7 +320,7 @@
       "factor": 0.6,
       "confidence": 0.7,
       "category": "opportunity",
-      "reasoning": "30.000–40.000 unbesetzte Stellen, Stellen über 200 Tage offen und der explizite Verweis auf KI, Telepflege und Roboter-Assistenten als Branchenantwort bestätigen den Kernnachfragetreiber für uCOREs entlastende Assistenzsysteme.",
+      "reasoning": "30.000–40.000 unbesetzte Stellen, Stellen über 200 Tage offen und der explizite Verweis auf KI, Telepflege und Roboter-Assistenten als Branchenantwort bestätigen den Kernnachfragetreiber für des Spin-offs entlastende Assistenzsysteme.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -349,7 +348,7 @@
       "factor": -0.6,
       "confidence": 0.7,
       "category": "risk",
-      "reasoning": "DRAM/NAND-Preise stiegen Q2 2026 um 58-75% bei Versorgungsdefiziten auf Höchststand seit 2011; jedes Edge-Gerät von uCORE enthält Speicher, daher drohen steigende Stücklistenkosten und Liefer-Unsicherheit.",
+      "reasoning": "DRAM/NAND-Preise stiegen Q2 2026 um 58-75% bei Versorgungsdefiziten auf Höchststand seit 2011; jedes Edge-Gerät von das Spin-off enthält Speicher, daher drohen steigende Stücklistenkosten und Liefer-Unsicherheit.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -391,7 +390,7 @@
       "factor": -0.2,
       "confidence": 0.7,
       "category": "risk",
-      "reasoning": "Konkretisiert das dreistufige CRA-Meldeschema und Security-by-Design-Pflichten bis 12/2027 – für uCORE als Edge-Plattformhersteller laufender Dokumentations- und Lifecycle-Aufwand.",
+      "reasoning": "Konkretisiert das dreistufige CRA-Meldeschema und Security-by-Design-Pflichten bis 12/2027 – für das Spin-off als Edge-Plattformhersteller laufender Dokumentations- und Lifecycle-Aufwand.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -419,7 +418,7 @@
       "factor": 0.25,
       "confidence": 0.7,
       "category": "opportunity",
-      "reasoning": "Wiederaufnahme des KfW-455-B-Zuschusses ab 08.04.2026 belebt den altersgerechten Umbaumarkt, in dem uCORE Assistenztechnik platzieren kann; der knappe Etat (50 Mio. EUR) begrenzt den Schub.",
+      "reasoning": "Wiederaufnahme des KfW-455-B-Zuschusses ab 08.04.2026 belebt den altersgerechten Umbaumarkt, in dem das Spin-off Assistenztechnik platzieren kann; der knappe Etat (50 Mio. EUR) begrenzt den Schub.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -433,7 +432,7 @@
       "factor": 0.2,
       "confidence": 0.4,
       "category": "opportunity",
-      "reasoning": "Notrufsysteme mit Sturzerkennung gelten als bezuschussbare Pflegehilfsmittel (Zuschuss zum 1.4.2026 erhöht) – bestätigt einen Erstattungsrahmen für uCOREs Notfallalarm, jedoch auf niedrigem Betragsniveau.",
+      "reasoning": "Notrufsysteme mit Sturzerkennung gelten als bezuschussbare Pflegehilfsmittel (Zuschuss zum 1.4.2026 erhöht) – bestätigt einen Erstattungsrahmen für des Spin-offs Notfallalarm, jedoch auf niedrigem Betragsniveau.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -447,7 +446,7 @@
       "factor": -0.5,
       "confidence": 0.7,
       "category": "risk",
-      "reasoning": "Indien sperrt ab 1.4.2026 Hikvision/Dahua-Kameras und verlangt Herkunftsnachweis; signalisiert global eskalierende Regulatorik gegen genau die chinesische Sensorik, die uCORE als Partnerkomponente einsetzt.",
+      "reasoning": "Indien sperrt ab 1.4.2026 Hikvision/Dahua-Kameras und verlangt Herkunftsnachweis; signalisiert global eskalierende Regulatorik gegen genau die chinesische Sensorik, die das Spin-off als Partnerkomponente einsetzt.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -475,7 +474,7 @@
       "factor": 0.45,
       "confidence": 0.65,
       "category": "opportunity",
-      "reasoning": "NIS2 (seit Dez. 2025) und DSGVO/DORA machen lokale Datenverarbeitung im Gesundheitswesen zur strategischen Pflicht – validiert direkt uCOREs Positionierung von Edge-Verarbeitung und Datensouveränität als Verkaufsargument.",
+      "reasoning": "NIS2 (seit Dez. 2025) und DSGVO/DORA machen lokale Datenverarbeitung im Gesundheitswesen zur strategischen Pflicht – validiert direkt des Spin-offs Positionierung von Edge-Verarbeitung und Datensouveränität als Verkaufsargument.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -503,7 +502,7 @@
       "factor": 0.5,
       "confidence": 0.6,
       "category": "opportunity",
-      "reasoning": "EnOcean erweitert ab Q2 2026 die batterielose Aktivitäts-/Belegungssensorik plus stärkeres TCM-600-Modul; als EnOcean-Partner kann uCORE diese energieautarken Funksensoren integrieren und chinesische Komponenten teilweise substituieren.",
+      "reasoning": "EnOcean erweitert ab Q2 2026 die batterielose Aktivitäts-/Belegungssensorik plus stärkeres TCM-600-Modul; als EnOcean-Partner kann das Spin-off diese energieautarken Funksensoren integrieren und chinesische Komponenten teilweise substituieren.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -517,7 +516,7 @@
       "factor": 0.2,
       "confidence": 0.6,
       "category": "opportunity",
-      "reasoning": "Der EHDS erzwingt Interoperabilität und strukturierte Gesundheitsdaten-Verarbeitung; uCOREs lokale, DSGVO-konforme Edge-Verarbeitung passt gut in den Rahmen und kann als Vertrauensargument dienen.",
+      "reasoning": "Der EHDS erzwingt Interoperabilität und strukturierte Gesundheitsdaten-Verarbeitung; des Spin-offs lokale, DSGVO-konforme Edge-Verarbeitung passt gut in den Rahmen und kann als Vertrauensargument dienen.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -559,7 +558,7 @@
       "factor": -0.5,
       "confidence": 0.6,
       "category": "risk",
-      "reasoning": "Branchenwarnung, dass sich die DRAM/NAND-Knappheit 2026 weiter verschärft und KI-Nachfrage Speicher von IoT-Geräten abzieht; betrifft die Beschaffung der Speicherkomponenten in uCOREs Edge-Hardware.",
+      "reasoning": "Branchenwarnung, dass sich die DRAM/NAND-Knappheit 2026 weiter verschärft und KI-Nachfrage Speicher von IoT-Geräten abzieht; betrifft die Beschaffung der Speicherkomponenten in des Spin-offs Edge-Hardware.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -573,7 +572,7 @@
       "factor": 0.3,
       "confidence": 0.5,
       "category": "opportunity",
-      "reasoning": "Shelly (uCORE-Partner) bringt rund ein Dutzend neue Matter-Geräte; erweitert das interoperable, nicht-chinesische Komponentenangebot und reduziert Abhängigkeit von einzelnen Sensorquellen.",
+      "reasoning": "Shelly (das Spin-off-Partner) bringt rund ein Dutzend neue Matter-Geräte; erweitert das interoperable, nicht-chinesische Komponentenangebot und reduziert Abhängigkeit von einzelnen Sensorquellen.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -615,7 +614,7 @@
       "factor": 0.6,
       "confidence": 0.5,
       "category": "opportunity",
-      "reasoning": "Starkes zweistelliges Wachstum des AAL-Marktes (Alterung, Wunsch nach selbstbestimmtem Wohnen) erweitert uCOREs adressierbaren Markt direkt; Konfidenz gedämpft, da reine Marktreport-Quelle.",
+      "reasoning": "Starkes zweistelliges Wachstum des AAL-Marktes (Alterung, Wunsch nach selbstbestimmtem Wohnen) erweitert des Spin-offs adressierbaren Markt direkt; Konfidenz gedämpft, da reine Marktreport-Quelle.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -643,7 +642,7 @@
       "factor": 0.3,
       "confidence": 0.5,
       "category": "opportunity",
-      "reasoning": "Bis Ende 2030 verlängerte Förderung (bis 40% der Digitalisierungskosten) für Pflegeeinrichtungen senkt die Investitionshürde für uCORE-Systeme zur Personalentlastung.",
+      "reasoning": "Bis Ende 2030 verlängerte Förderung (bis 40% der Digitalisierungskosten) für Pflegeeinrichtungen senkt die Investitionshürde für das Spin-off-Systeme zur Personalentlastung.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -671,7 +670,7 @@
       "factor": 0.35,
       "confidence": 0.6,
       "category": "opportunity",
-      "reasoning": "GEG/EPBD/CSRD treiben verpflichtendes digitales Energiemonitoring und Gebäudeautomation – regulatorischer Rückenwind für uCOREs Vertical Gebäudeautomation/Energiemonitoring.",
+      "reasoning": "GEG/EPBD/CSRD treiben verpflichtendes digitales Energiemonitoring und Gebäudeautomation – regulatorischer Rückenwind für des Spin-offs Vertical Gebäudeautomation/Energiemonitoring.",
       "model": "claude (fan-out, Opus+Web)"
     },
     {
@@ -699,7 +698,7 @@
       "factor": -0.4,
       "confidence": 0.65,
       "category": "risk",
-      "reasoning": "Anhaltender politischer Druck im EU-Parlament gegen Hikvision erhöht die Wahrscheinlichkeit künftiger Beschaffungsrestriktionen; da uCORE Hikvision als Partner führt, droht Reputations- und Ausschreibungsrisiko.",
+      "reasoning": "Anhaltender politischer Druck im EU-Parlament gegen Hikvision erhöht die Wahrscheinlichkeit künftiger Beschaffungsrestriktionen; da das Spin-off Hikvision als Partner führt, droht Reputations- und Ausschreibungsrisiko.",
       "model": "claude (fan-out, Opus+Web)"
     }
   ]
